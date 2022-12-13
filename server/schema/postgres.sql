@@ -2,8 +2,7 @@ CREATE TABLE IF NOT EXISTS user (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     name text,
     email text NOT NULL,
-    password bytea NOT NULL,
-    salt bytea NOT NULL,
+    password text NOT NULL,
     created_at timestamp NOT NULL DEFAULT now(),
     updated_at timestamp NOT NULL DEFAULT now(),
     UNIQUE(email)
