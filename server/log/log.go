@@ -1,6 +1,7 @@
 package log
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -26,14 +27,14 @@ func New() Logger {
 	return logger
 }
 
-func (logger *Logger) Info(info string) {
-	logger.infoLogger.Output(2, info)
+func (logger *Logger) Info(info string, a ...any) {
+	logger.infoLogger.Output(2, fmt.Sprintf(info, a...))
 }
 
-func (logger *Logger) Warning(warning string) {
-	logger.warningLogger.Output(2, warning)
+func (logger *Logger) Warning(warning string, a ...any) {
+	logger.warningLogger.Output(2, fmt.Sprintf(warning, a...))
 }
 
-func (logger *Logger) Error(err string) {
-	logger.errorLogger.Output(2, err)
+func (logger *Logger) Error(err string, a ...any) {
+	logger.errorLogger.Output(2, fmt.Sprintf(err, a...))
 }
