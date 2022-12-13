@@ -1,5 +1,5 @@
 {
     "environment": "development",
-    "db": "postgresql://urlshorten:urlshorten@127.0.0.1:5432/urlshorten",
+    "db": "postgresql://urlshorten:secure@127.0.0.1:5432/urlshorten?sslmode=disable",
     "bind": ":8080"
 }

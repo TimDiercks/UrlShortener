@@ -1,13 +1,15 @@
 package main
 
 import (
-	"database/sql"
 	"os"
 	"urlshortener/app"
 	"urlshortener/config"
 	"urlshortener/db"
 	"urlshortener/log"
+	"urlshortener/router"
 
+	"github.com/gofrs/uuid"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
@@ -19,8 +21,7 @@ func main() {
 	app.Logger = log.New()
 	app.Logger.Info("Urlshortener starting...")
 	if len(os.Args) <= 1 {
-		app.Logger.Error("Config is missing")
-		return
+		app.Logger.Panic("Config is missing")
 	}
 
 	// Config
@@ -28,17 +29,21 @@ func main() {
 	app.Logger.Info("Reading config \"%s\"", configPath)
 	app.Config, err = config.Parse(configPath)
 	if err != nil {
-		app.Logger.Error("Could not parse config", configPath)
-		return
+		app.Logger.Panic("Could not parse config", configPath)
 	}
 
 	// Database
 	app.Logger.Info("Connecting to database...")
-	dbConn, err := sql.Open("postgres", app.Config.DB)
+	dbConn, err := sqlx.Open("postgres", app.Config.DB)
 	if err != nil {
 		app.Logger.Panic(err.Error())
 	}
 	app.DB = db.New(dbConn)
 	app.Logger.Info("Database connection established")
 
+	app.DB.InsertShortUrl(db.CreateShortUrlParams{UserId: uuid.Nil, ShortUrl: "jj", FullUrl: "https://portainer.josefjantzen.de"})
+
+	// Router
+	router := router.New(&app)
+	router.InitRouter(&app)
 }
