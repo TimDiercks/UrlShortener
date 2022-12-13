@@ -10,6 +10,7 @@ type Logger struct {
 	infoLogger    *log.Logger
 	warningLogger *log.Logger
 	errorLogger   *log.Logger
+	panicLogger   *log.Logger
 }
 
 func New() *Logger {
@@ -23,6 +24,7 @@ func New() *Logger {
 	logger.infoLogger = log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 	logger.warningLogger = log.New(file, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
 	logger.errorLogger = log.New(file, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+	logger.panicLogger = log.New(file, "PANIC: ", log.Ldate|log.Ltime|log.Lshortfile)
 
 	return &logger
 }
@@ -37,4 +39,9 @@ func (logger *Logger) Warning(warning string, a ...any) {
 
 func (logger *Logger) Error(err string, a ...any) {
 	logger.errorLogger.Output(2, fmt.Sprintf(err, a...))
+}
+
+func (logger *Logger) Panic(err string, a ...any) {
+	logger.panicLogger.Output(2, fmt.Sprintf(err, a...))
+	panic(fmt.Sprintf(err, a...))
 }
