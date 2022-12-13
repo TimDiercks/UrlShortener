@@ -27,13 +27,13 @@ func New() Logger {
 }
 
 func (logger *Logger) Info(info string) {
-	logger.infoLogger.Println(info)
+	logger.infoLogger.Output(2, info)
 }
 
 func (logger *Logger) Warning(warning string) {
-	logger.warningLogger.Println(warning)
+	logger.warningLogger.Output(2, warning)
 }
 
 func (logger *Logger) Error(err string) {
-	logger.errorLogger.Println(err)
+	logger.errorLogger.Output(2, err)
 }
