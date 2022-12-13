@@ -12,7 +12,7 @@ type Logger struct {
 	errorLogger   *log.Logger
 }
 
-func New() Logger {
+func New() *Logger {
 	file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		panic("Error: Log file could not be created")
@@ -24,7 +24,7 @@ func New() Logger {
 	logger.warningLogger = log.New(file, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
 	logger.errorLogger = log.New(file, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 
-	return logger
+	return &logger
 }
 
 func (logger *Logger) Info(info string, a ...any) {
