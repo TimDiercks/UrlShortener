@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"net/http"
 	"strings"
@@ -30,6 +32,14 @@ func (a *Auth) TokenAuth(endpoint func(w http.ResponseWriter, r *http.Request)) 
 	})
 }
 
+func (a *Auth) GenerateApiKey() string {
+	b := make([]byte, apiKeyLength)
+	if _, err := rand.Read(b); err != nil {
+		return ""
+	}
+	return hex.EncodeToString(b)
+}
+
 func parseApiKey(header string) (string, error) {
 	token := strings.Split(header, "Bearer ")
 	if len(token) != 2 {
@@ -41,4 +51,5 @@ func parseApiKey(header string) (string, error) {
 
 var (
 	errTokenNotFound = errors.New("could not find token in header")
+	apiKeyLength     = 32
 )

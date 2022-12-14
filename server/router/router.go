@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"urlshortener/api"
 	"urlshortener/app"
+	"urlshortener/auth"
 
 	"github.com/gorilla/mux"
 )
@@ -22,7 +23,8 @@ func (router *Router) InitRouter(app *app.App) {
 	myRouter := mux.NewRouter().StrictSlash(true)
 
 	api := api.New(app)
-
+	auth := auth.New(app)
+	_ = auth
 	myRouter.HandleFunc("/{shorturl}", api.Redirect).Methods("GET")
 
 	app.Logger.Panic(http.ListenAndServe(":8080", myRouter).Error())
