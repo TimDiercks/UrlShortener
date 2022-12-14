@@ -8,7 +8,6 @@ import (
 	"urlshortener/log"
 	"urlshortener/router"
 
-	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
@@ -40,8 +39,6 @@ func main() {
 	}
 	app.DB = db.New(dbConn)
 	app.Logger.Info("Database connection established")
-
-	app.DB.InsertShortUrl(db.CreateShortUrlParams{UserId: uuid.Nil, ShortUrl: "jj", FullUrl: "https://portainer.josefjantzen.de"})
 
 	// Router
 	router := router.New(&app)

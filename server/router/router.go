@@ -2,6 +2,7 @@ package router
 
 import (
 	"net/http"
+	"urlshortener/api"
 	"urlshortener/app"
 
 	"github.com/gorilla/mux"
@@ -17,21 +18,12 @@ func New(app *app.App) *Router {
 	}
 }
 
-func (router *Router) redirect(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	shortUrl := vars["shorturl"]
-
-	fullUrl, err := router.app.DB.GetFullUrlFromShortUrl(shortUrl)
-	if err != nil {
-		router.app.Logger.Info("No Url found for request with shorturl \"%s\"", shortUrl)
-	}
-	http.Redirect(w, r, fullUrl, http.StatusSeeOther)
-}
-
 func (router *Router) InitRouter(app *app.App) {
 	myRouter := mux.NewRouter().StrictSlash(true)
 
-	myRouter.HandleFunc("/{shorturl}", router.redirect).Methods("GET")
+	api := api.New(app)
+
+	myRouter.HandleFunc("/{shorturl}", api.Redirect).Methods("GET")
 
 	app.Logger.Panic(http.ListenAndServe(":8080", myRouter).Error())
 }
