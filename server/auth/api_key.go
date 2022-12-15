@@ -8,15 +8,23 @@ import (
 	"strings"
 )
 
-func (a *Auth) TokenAuth(endpoint func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		auth := r.Header.Get("Authorization")
-		if len(auth) == 0 {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
+func ApiKeyFromRequest(r *http.Request) (string, error) {
+	auth := r.Header.Get("Authorization")
+	if len(auth) == 0 {
+		return "", errTokenNotFound
+	}
 
-		token, err := parseApiKey(auth)
+	token, err := parseApiKey(auth)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
+
+func (a *Auth) KeyAuth(endpoint func(w http.ResponseWriter, r *http.Request)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token, err := ApiKeyFromRequest(r)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			return

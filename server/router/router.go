@@ -22,10 +22,10 @@ func New(app *app.App) *Router {
 func (router *Router) InitRouter(app *app.App) {
 	myRouter := mux.NewRouter().StrictSlash(true)
 
-	api := api.New(app)
 	auth := auth.New(app)
-	_ = auth
-	myRouter.HandleFunc("/{shorturl}", api.Redirect).Methods("GET")
+	api := api.New(app, auth)
+
+	api.InitRoutes(myRouter)
 
 	app.Logger.Panic(http.ListenAndServe(":8080", myRouter).Error())
 }

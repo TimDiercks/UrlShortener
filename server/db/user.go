@@ -1,29 +1,22 @@
 package db
 
 import (
-	"crypto/sha1"
-	"encoding/base64"
 	"time"
 
 	"github.com/gofrs/uuid"
 )
 
-type ShortUrl struct {
+type User struct {
 	Id        uuid.UUID `db:"id"`
-	UserId    uuid.UUID `db:"user_id"`
-	ShortUrl  string    `db:"short_url"`
-	FullUrl   string    `db:"full_url"`
+	Name      string    `db:"name"`
+	Email     string    `db:"email"`
+	Password  string    `db:"password"`
+	Role      string    `db:"role"`
+	UpdateAt  time.Time `db:"updated_at"`
 	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
 }
 
-type CreateShortUrlParams struct {
-	UserId   uuid.UUID
-	ShortUrl string
-	FullUrl  string
-}
-
-func (d *DB) InsertShortUrl(args CreateShortUrlParams) (ShortUrl, error) {
+func (d *DB) InsertUser(args CreateShortUrlParams) (ShortUrl, error) {
 	const q = `
 INSERT INTO urls(
 		user_id,
@@ -42,15 +35,16 @@ RETURNING *
 	return shortUrl, row.StructScan(&shortUrl)
 }
 
-type UpdateShortUrlParams struct {
+/* TODO:
+type UpdateUserParams struct {
 	Id       uuid.UUID
 	ShortUrl string
 	FullUrl  string
 }
 
-func (d *DB) UpdateShortUrl(args UpdateShortUrlParams) (ShortUrl, error) {
+func (d *DB) UpdateUser(args UpdateUserParams) (ShortUrl, error) {
 	const q = `
-UPDATE urls 
+UPDATE urls
 SET shorturl=$1,
 	fullurl=$2,
 	updated_at=now()
@@ -63,7 +57,7 @@ RETURNING *
 	return shortUrl, row.StructScan(&shortUrl)
 }
 
-func (d *DB) DeleteShortUrlById(id uuid.UUID) error {
+func (d *DB) DeleteUserById(id uuid.UUID) error {
 	const q = `
 DELETE
 FROM urls
@@ -74,7 +68,7 @@ WHERE id = $1
 	return err
 }
 
-func (d *DB) GetFullUrlFromShortUrl(ShortUrl string) (string, error) {
+func (d *DB) GetUserById(ShortUrl string) (string, error) {
 	const q = `
 SELECT full_url
 FROM urls
@@ -84,11 +78,17 @@ WHERE short_url = $1
 	row := d.db.QueryRow(q, ShortUrl)
 	var fullUrl string
 	return fullUrl, row.Scan(&fullUrl)
-}
+}*/
 
-func GenerateShortUrl(key, FullUrl string) string {
-	b := []byte(key + FullUrl)
-	hash := sha1.Sum(b)
-	baseString := base64.StdEncoding.EncodeToString(hash[:])
-	return baseString[:10]
+func (d *DB) GetUserByApiKey(key string) (User, error) {
+	const q = `
+SELECT u.*
+FROM users u 
+INNER JOIN apikeys a ON u.id = a.user_id
+WHERE a.key = $1
+	`
+
+	row := d.db.QueryRowx(q, key)
+	var user User
+	return user, row.StructScan(&user)
 }
