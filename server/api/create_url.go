@@ -5,18 +5,20 @@ import (
 	"net/http"
 	"urlshortener/auth"
 	"urlshortener/db"
+
+	"github.com/gorilla/mux"
 )
 
 type RequestUrlParams struct {
 	FullUrl  string `json:"url"`
-	ShortUrl string `json:"myShort"`
+	ShortUrl string `json:"customUrl"`
 }
 
 type ResponseRequestUrl struct {
-	ShortUrl string `json:"shortUrl"`
+	Url string `json:"url"`
 }
 
-func (api *Api) RequestUrl(w http.ResponseWriter, r *http.Request) {
+func (api *Api) AddNewShort(w http.ResponseWriter, r *http.Request) {
 	var req RequestUrlParams
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -52,8 +54,34 @@ func (api *Api) RequestUrl(w http.ResponseWriter, r *http.Request) {
 		ShortUrl: shortUrl,
 		FullUrl:  req.FullUrl,
 	})
+	if err != nil {
+		api.app.Logger.Error(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
-	res, err := json.Marshal(ResponseRequestUrl{ShortUrl: url.ShortUrl})
+	res, err := json.Marshal(ResponseRequestUrl{Url: url.ShortUrl})
+	if err != nil {
+		api.app.Logger.Error(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(res)
+}
+
+func (api *Api) GetFullFromShort(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	shortUrl := vars["shorturl"]
+
+	fullUrl, err := api.app.DB.GetFullUrlFromShortUrl(shortUrl)
+	if err != nil {
+		api.app.Logger.Error(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	res, err := json.Marshal(ResponseRequestUrl{Url: fullUrl})
 	if err != nil {
 		api.app.Logger.Error(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
