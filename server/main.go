@@ -37,6 +37,9 @@ func main() {
 	if err != nil {
 		app.Logger.Panic(err.Error())
 	}
+	if err = dbConn.Ping(); err != nil {
+		app.Logger.Panic("Database connection could not be established")
+	}
 	app.DB = db.New(dbConn)
 	app.Logger.Info("Database connection established")
 

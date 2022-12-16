@@ -30,14 +30,17 @@ func New() *Logger {
 }
 
 func (logger *Logger) Info(info string, a ...any) {
+	fmt.Printf(info+"\n", a...)
 	logger.infoLogger.Output(2, fmt.Sprintf(info, a...))
 }
 
 func (logger *Logger) Warning(warning string, a ...any) {
+	fmt.Printf(warning+"\n", a...)
 	logger.warningLogger.Output(2, fmt.Sprintf(warning, a...))
 }
 
 func (logger *Logger) Error(err string, a ...any) {
+	fmt.Printf(err+"\n", a...)
 	logger.errorLogger.Output(2, fmt.Sprintf(err, a...))
 }
 
