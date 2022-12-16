@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"urlshortener/auth"
 	"urlshortener/db"
-
-	"github.com/gorilla/mux"
 )
 
 type RequestUrlParams struct {
@@ -15,7 +13,7 @@ type RequestUrlParams struct {
 }
 
 type ResponseRequestUrl struct {
-	Url string `json:"url"`
+	ShortUrl string `json:"shortUrl"`
 }
 
 func (api *Api) AddNewShort(w http.ResponseWriter, r *http.Request) {
@@ -60,28 +58,7 @@ func (api *Api) AddNewShort(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := json.Marshal(ResponseRequestUrl{Url: url.ShortUrl})
-	if err != nil {
-		api.app.Logger.Error(err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Write(res)
-}
-
-func (api *Api) GetFullFromShort(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	shortUrl := vars["shorturl"]
-
-	fullUrl, err := api.app.DB.GetFullUrlFromShortUrl(shortUrl)
-	if err != nil {
-		api.app.Logger.Error(err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	res, err := json.Marshal(ResponseRequestUrl{Url: fullUrl})
+	res, err := json.Marshal(ResponseRequestUrl{ShortUrl: url.ShortUrl})
 	if err != nil {
 		api.app.Logger.Error(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)

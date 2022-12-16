@@ -35,32 +35,12 @@ RETURNING *
 	return shortUrl, row.StructScan(&shortUrl)
 }
 
-/* TODO:
-type UpdateUserParams struct {
-	Id       uuid.UUID
-	ShortUrl string
-	FullUrl  string
-}
-
-func (d *DB) UpdateUser(args UpdateUserParams) (ShortUrl, error) {
-	const q = `
-UPDATE urls
-SET shorturl=$1,
-	fullurl=$2,
-	updated_at=now()
-WHERE id=$3
-RETURNING *
-	`
-
-	row := d.db.QueryRowx(q, args.ShortUrl, args.FullUrl, args.Id)
-	var shortUrl ShortUrl
-	return shortUrl, row.StructScan(&shortUrl)
-}
+// TODO: update user functionality
 
 func (d *DB) DeleteUserById(id uuid.UUID) error {
 	const q = `
 DELETE
-FROM urls
+FROM users
 WHERE id = $1
 	`
 
@@ -68,17 +48,29 @@ WHERE id = $1
 	return err
 }
 
-func (d *DB) GetUserById(ShortUrl string) (string, error) {
+func (d *DB) GetUserById(userId uuid.UUID) (User, error) {
 	const q = `
-SELECT full_url
-FROM urls
-WHERE short_url = $1
+SELECT *
+FROM users
+WHERE id = $1
 	`
 
-	row := d.db.QueryRow(q, ShortUrl)
-	var fullUrl string
-	return fullUrl, row.Scan(&fullUrl)
-}*/
+	row := d.db.QueryRowx(q, userId)
+	var user User
+	return user, row.StructScan(&user)
+}
+
+func (d *DB) GetShortUrlsByUserId(userId uuid.UUID) ([]ShortUrl, error) {
+	const q = `
+SELECT u.*
+FROM urls u 
+WHERE u.id = $1
+	`
+
+	row := d.db.QueryRowx(q, userId)
+	var urls []ShortUrl
+	return urls, row.StructScan(&urls)
+}
 
 func (d *DB) GetUserByApiKey(key string) (User, error) {
 	const q = `
