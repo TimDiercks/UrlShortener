@@ -27,5 +27,5 @@ func (router *Router) InitRouter(app *app.App) {
 
 	api.InitRoutes(myRouter)
 
-	app.Logger.Panic(http.ListenAndServe(":8080", myRouter).Error())
+	app.Logger.Panic(http.ListenAndServe(app.Config.Bind, myRouter).Error())
 }
