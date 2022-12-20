@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  urlshorten:
+    image: registry.timdiercks.de/url-shorten
+    restart: always
+    networks:
+      - urlshorten
+    ports:
+      - '55469:8080'
+    depends_on:
+      - db
+      
+  db:
+    image: registry.timdiercks.de/url-shorten-db:v1
+    restart: always
+    environment:
+      - POSTGRES_DB=urlshorten
+      - POSTGRES_USER=urlshorten
+      - POSTGRES_PASSWORD=secure
+    hostname: db
+    networks:
+      - urlshorten
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+      - ./server/schema/postgres.sql:/docker-entrypoint-initdb.d/1_schema.sql
+
+volumes:
+  db:
+    driver: local
+
+networks:
+  urlshorten:
+    driver: bridge

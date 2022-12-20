@@ -11,7 +11,7 @@ RUN go mod download
 ADD . /app/
 COPY *.go ./
 
-RUN go build -o /urlshorten
+RUN GOOS=linux GOARCH=arm go build -o /urlshorten
 
 FROM gcr.io/distroless/base-debian10
 
